@@ -7,7 +7,7 @@ client = make_client(MongoClient, 'test')
 
 
 class User(Model):
-    __tb__ = client['user']
+    # __tb__ = client['user']
     _id = field.IntField()
     name = field.StrField(unique=True)
     age = field.IntField(require=False, default=None)

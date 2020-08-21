@@ -14,6 +14,9 @@ class MetaModel(type):
                 attr.real_attr = '_{}#{}'.format(type_name, key)
                 if attr.unique:
                     attr_dict['__unique_index__'].append(key)
+        if '__tb__' not in attr_dict:
+            attr_dict["__tb__"] = None
+            
         return super().__new__(cls, name, bases, attr_dict)
 
     def __getattr__(cls, key):
@@ -21,7 +24,7 @@ class MetaModel(type):
         if attr:
             return attr
         else:
-            raise AttributeError("")
+            raise AttributeError("not found")
 
 class Model(metaclass=MetaModel):
     def __init__(self, **kwargs):
