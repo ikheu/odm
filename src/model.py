@@ -4,18 +4,18 @@ from pymongo import IndexModel
 
 class MetaModel(type):
     def __new__(cls, name, bases, attr_dict):
-        # if name != 'Model':
-        attr_dict['__fieldkeys__'] = []
-        attr_dict['__unique_index__'] = []
-        for key, attr in attr_dict.items():
-            if isinstance(attr, BaseField):
-                attr_dict['__fieldkeys__'].append(key)
-                type_name = type(attr).__name__
-                attr.real_attr = '_{}#{}'.format(type_name, key)
-                if attr.unique:
-                    attr_dict['__unique_index__'].append(key)
-        if '__tb__' not in attr_dict:
-            attr_dict["__tb__"] = None
+        if name != 'Model':
+            attr_dict['__fieldkeys__'] = []
+            attr_dict['__unique_index__'] = []
+            for key, attr in attr_dict.items():
+                if isinstance(attr, BaseField):
+                    attr_dict['__fieldkeys__'].append(key)
+                    type_name = type(attr).__name__
+                    attr.real_attr = '_{}#{}'.format(type_name, key)
+                    if attr.unique:
+                        attr_dict['__unique_index__'].append(key)
+            if '__tb__' not in attr_dict:
+                attr_dict["__tb__"] = None
             
         return super().__new__(cls, name, bases, attr_dict)
 
@@ -24,7 +24,7 @@ class MetaModel(type):
         if attr:
             return attr
         else:
-            raise AttributeError("not found")
+            raise AttributeError("%s object has no attribute '%s'" % (cls.__name__, key))
 
 class Model(metaclass=MetaModel):
     def __init__(self, **kwargs):
