@@ -5,16 +5,21 @@ from factory import make_client
 
 client = make_client(MongoClient, 'test')
 
+
 class User(Model):
     __tb__ = client['user']
-    name = field.StrField()
-    age = field.IntField()
+    _id = field.IntField()
+    name = field.StrField(unique=True)
+    age = field.IntField(require=False, default=None)
+    country = field.StrField(require=False, default="China")
 
 
 if __name__ == '__main__':
-    u = User(name='Bob', age=10)
-    print(u)
-    print(u.dump())
-    print(User.load({'name': 'Tom', 'age': 20}))
-    u.commit()
-    print(User.find_one())
+    User.drop()
+    User.create_index("name", unique=True)
+    User.ensure_unique()
+    u1 = User(name='Bob', age=11, _id=10)
+    u2 = User(name="Bob1", age=12, _id=11)
+    u1.commit()
+    u2.commit()
+    print(list(User.find()))

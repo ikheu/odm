@@ -13,15 +13,17 @@ class Descriptor:
 
 
 class BaseField(abc.ABC, Descriptor):
-    valid_attrs = {'validate', 'required', 'default', 'fkey'}
-
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            if key in self.valid_attrs:
-                pass # 斟酌一下怎么处理
-        
+    def __init__(self, unique=False, require=True, **kwargs):
+        self.unique = unique
+        self.require = require
+        if not self.require and 'default' in kwargs:
+            self.default = kwargs['default']
+    
     def __set__(self, instance, value):
-        value = self.validate(value)
+        if hasattr(self, 'default') and self.default is None and value is None:
+            pass
+        else:
+            value = self.validate(value)
         super().__set__(instance, value)
 
     @abc.abstractmethod
@@ -35,6 +37,10 @@ class TypeField(BaseField):
             return value
         else:
             raise ValueError(" ")
+
+class Time(BaseField):
+    def validate(self, value):
+        pass
 
 
 class StrField(TypeField):

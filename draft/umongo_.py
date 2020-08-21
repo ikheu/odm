@@ -25,7 +25,7 @@ goku.commit()
 vegeta = User(email='vegeta@over9000.com', friends=[goku])
 vegeta.commit()
 
-vegeta.friends
+print(vegeta.friends)
 # <object umongo.data_objects.List([<object umongo.dal.pymongo.PyMongoReference(document=User, pk=ObjectId('5717568613adf27be6363f78'))>])>
 vegeta.dump()
 # {id': '570ddb311d41c89cabceeddc', 'email': 'vegeta@over9000.com', friends': ['570ddb2a1d41c89cabceeddb']}
