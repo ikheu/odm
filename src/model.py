@@ -2,6 +2,22 @@ from field import BaseField
 from pymongo import IndexModel
 
 
+class Collection():
+    ops = ['drop', 'create_indexes', 'insert', 'find']
+
+    @classmethod
+    def ensure_unique(cls):
+        indexes = []
+        for item in cls.__unique_index__:
+            indexes.append(IndexModel(item, unique=True, background=True))
+        res = cls.create_indexes(indexes)
+        return res
+
+    def commit(self):
+        data = self.dump()
+        self.__class__.insert(data)
+
+
 class MetaModel(type):
     def __new__(cls, name, bases, attr_dict):
         if name != 'Model':
@@ -16,27 +32,19 @@ class MetaModel(type):
                         attr_dict['__unique_index__'].append(key)
             if '__tb__' not in attr_dict:
                 attr_dict["__tb__"] = None
-            
+        bases = (*bases, Collection)
         return super().__new__(cls, name, bases, attr_dict)
 
     def __getattr__(cls, key):
-        attr = getattr(cls.__tb__, key, None)
-        if attr:
-            return attr
-        else:
-            raise AttributeError("%s object has no attribute '%s'" % (cls.__name__, key))
+        if key in cls.ops:
+            attr = getattr(cls.__tb__, key, None)
+            if attr:
+                return attr
+        raise AttributeError("%s object has no attribute '%s'" % (cls.__name__, key))
 
 class Model(metaclass=MetaModel):
     def __init__(self, **kwargs):
         self.handle_keys(kwargs)
-
-    @classmethod
-    def ensure_unique(cls):
-        indexes = []
-        for item in cls.__unique_index__:
-            indexes.append(IndexModel(item, unique=True, background=True))
-        res = cls.create_indexes(indexes)
-        return res
 
     def handle_keys(self, kwargs):
         data = {}
@@ -49,7 +57,6 @@ class Model(metaclass=MetaModel):
                     raise ValueError("'%s' field is required" % k)
                 else:
                     data[k] = field.default
-            
         for k, v in data.items():
             setattr(self, k, v)
     
@@ -62,10 +69,6 @@ class Model(metaclass=MetaModel):
         for key in self.__fieldkeys__:
             data[key] = getattr(self, key)
         return data
-
-    def commit(self):
-        data = self.dump()
-        self.__class__.insert(data)
 
     @classmethod
     def load(cls, dict_data):

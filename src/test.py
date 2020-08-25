@@ -16,7 +16,6 @@ class User(Model):
 
 if __name__ == '__main__':
     User.drop()
-    User.create_index("name", unique=True)
     User.ensure_unique()
     u1 = User(name='Bob', age=11, _id=10)
     u2 = User(name="Bob1", age=12, _id=11)

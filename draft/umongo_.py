@@ -12,12 +12,12 @@ class User(Document):
     friends = fields.ListField(fields.ReferenceField("User"))
 
     class Meta:
-        collection_name = "user"
+        collection_name = "user1"
 
+print(dir(User))
+print(User.email)
 # Make sure that unique indexes are created
-print(db.user.remove())
-print(type(db.user))
-# exit(0)
+print(db.user1.remove())
 User.ensure_indexes()
 
 goku = User(email='goku@sayen.com', birthday=datetime(1984, 11, 20))
@@ -33,4 +33,4 @@ User.find_one({"email": 'goku@sayen.com'})
 # <object Document __main__.User({'id': ObjectId('570ddb2a1d41c89cabceeddb'), 'friends': <object umongo.data_objects.List([])>,
 #                                 'email': 'goku@sayen.com', 'birthday': datetime.datetime(1984, 11, 20, 0, 0)})>
 
-print(list(db.user.find()))
+print(list(db.user1.find()))
