@@ -1,13 +1,15 @@
 import field as field
 from model import Model
 from pymongo import MongoClient
-from factory import make_client
-
-client = make_client(MongoClient, 'test')
+from collection import PymongoCollection
 
 
+db = MongoClient().test
+instance = PymongoCollection(db)
+
+
+@instance.register('user')
 class User(Model):
-    __tb__ = client['user']
     _id = field.IntField()
     name = field.StrField(unique=True)
     age = field.IntField(require=False, default=None)

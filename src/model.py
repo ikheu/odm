@@ -1,21 +1,4 @@
 from field import BaseField
-from pymongo import IndexModel
-
-
-class Collection():
-    ops = ['drop', 'create_indexes', 'insert', 'find']
-
-    @classmethod
-    def ensure_unique(cls):
-        indexes = []
-        for item in cls.__unique_index__:
-            indexes.append(IndexModel(item, unique=True, background=True))
-        res = cls.create_indexes(indexes)
-        return res
-
-    def commit(self):
-        data = self.dump()
-        self.__class__.insert(data)
 
 
 class MetaModel(type):
@@ -30,17 +13,8 @@ class MetaModel(type):
                     attr.real_attr = '_{}#{}'.format(type_name, key)
                     if attr.unique:
                         attr_dict['__unique_index__'].append(key)
-            if '__tb__' not in attr_dict:
-                attr_dict["__tb__"] = None
-        bases = (*bases, Collection)
         return super().__new__(cls, name, bases, attr_dict)
 
-    def __getattr__(cls, key):
-        if key in cls.ops:
-            attr = getattr(cls.__tb__, key, None)
-            if attr:
-                return attr
-        raise AttributeError("%s object has no attribute '%s'" % (cls.__name__, key))
 
 class Model(metaclass=MetaModel):
     def __init__(self, **kwargs):

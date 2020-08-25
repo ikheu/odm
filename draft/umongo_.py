@@ -3,6 +3,8 @@ from pymongo import MongoClient
 from umongo import Instance, Document, fields, validate
 
 db = MongoClient().test
+print('-----')
+print(db)
 instance = Instance(db)
 
 @instance.register
@@ -15,7 +17,7 @@ class User(Document):
         collection_name = "user1"
 
 print(dir(User))
-print(User.email)
+# print(User.email)
 # Make sure that unique indexes are created
 print(db.user1.remove())
 User.ensure_indexes()

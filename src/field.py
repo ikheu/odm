@@ -1,5 +1,4 @@
 import abc
-# from exceptions import 
 
 class Descriptor:
     def __get__(self, instance, owner):
